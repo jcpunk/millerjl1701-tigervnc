@@ -1,0 +1,4 @@
+*.rb eol=lf linguist-language=Ruby
+*.erb eol=lf linguist-language=Ruby
+*.pp eol=lf linguist-language=Puppet
+*.sh eol=lf

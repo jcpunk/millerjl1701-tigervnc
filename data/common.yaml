@@ -1,0 +1,7 @@
+---
+
+tigervnc::package_ensure: 'present'
+tigervnc::package_name: 'tigervnc'
+tigervnc::service_enable: true
+tigervnc::service_ensure: 'running'
+tigervnc::service_name: 'tigervnc'
