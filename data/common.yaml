@@ -1,7 +1,15 @@
 ---
 
+lookup_options:
+  tigervnc::sysconfig_vncservers:
+    merge: hash
+
+tigervnc::manage_vncuser_passwords: true
 tigervnc::package_ensure: 'present'
 tigervnc::package_name: 'tigervnc-server'
 tigervnc::service_enable: true
 tigervnc::service_ensure: 'running'
 tigervnc::service_name: 'vncserver'
+tigervnc::sysconfig_template: 'tigervnc/sysconfig_vncservers.erb'
+tigervnc::user_homedir_path: '/home'
+tigervnc::vncuser_default_passwd: 'ChangeMe'

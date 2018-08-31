@@ -1,3 +1,4 @@
 ---
 
-{}
+tigervnc::sysconfig_vncservers:
+  'testuser': '1'

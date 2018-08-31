@@ -8,13 +8,20 @@
 # @param service_enable Whether to enable the tigervnc service at boot.
 # @param service_ensure Whether the tigervnc service should be running.
 # @param service_name Specifies the name of the service to manage.
+# @param sysconfig_template Specifies the template to use for /etc/sysconfig/vncservers.
+# @param vncservers Hash of hashes that specifies vncservers and associated properties.
 #
 class tigervnc (
-  String                     $package_ensure = 'present',
-  String                     $package_name   = 'tigervnc-server',
-  Boolean                    $service_enable = true,
-  Enum['running', 'stopped'] $service_ensure = 'running',
-  String                     $service_name   = 'vncserver',
+  Hash                       $vncservers,
+  Boolean                    $manage_vncuser_passwords = true,
+  String                     $package_ensure           = 'present',
+  String                     $package_name             = 'tigervnc-server',
+  Boolean                    $service_enable           = true,
+  Enum['running', 'stopped'] $service_ensure           = 'running',
+  String                     $service_name             = 'vncserver',
+  String                     $sysconfig_template       = 'tigervnc/sysconfig_vncservers.erb',
+  Stdlib::Unixpath           $user_homedir_path        = '/home', 
+  String                     $vncuser_default_passwd   = 'ChangeMe',
   ) {
   case $::operatingsystem {
     'RedHat', 'CentOS': {
