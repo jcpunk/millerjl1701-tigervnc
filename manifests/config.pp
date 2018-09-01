@@ -5,6 +5,11 @@
 class tigervnc::config {
   assert_private('tigervnc::config is a private class')
 
+ $_vncservers = $tigervnc::vncservers
+ $_vncservers_length = length($_vncservers)
+ if $_vncservers_length == 0 {
+   fail("no vncservers were defined for use with tigervnc::config class")
+ }
 
   case $::operatingsystem {
     'RedHat', 'CentOS': {
@@ -43,9 +48,6 @@ class tigervnc::config {
 
       case $::operatingsystemmajrelease {
         '6': {
-
-          $_vncservers = $tigervnc::vncservers
-
           file { '/etc/sysconfig/vncservers':
             ensure  => present,
             owner   => 'root',
@@ -57,30 +59,24 @@ class tigervnc::config {
         '7': {
           include ::systemd::systemctl::daemon_reload
 
-          $_vncservers = $tigervnc::vncservers
-          $_vncservers_length = length($_vncservers)
-          if $_vncservers_length == 0 {
-            fail("no vncservers were defined for use with tigervnc::config class on the CentOS 7 OS")
-          } else {
-            $_vncservers.each |String $username, Hash $useropts| {
-              if 'ensure' in $useropts {
-                $_ensure = $useropts[ensure]
-              } else {
-                $_ensure = 'present'
-              }
-              $_displaynumber = $useropts[displaynumber]
-              if 'args' in $useropts {
-                $_args = $useropts[args]
-                file { "/etc/systemd/system/vncserver@:${_displaynumber}.service":
-                  ensure  => $_ensure,
-                  content =>  epp('tigervnc/systemd_service_with_args.epp', { 'username' =>  $username, 'args' =>  $_args }),
-                } ~> Class['systemd::systemctl::daemon_reload']
-              } else {
-                file { "/etc/systemd/system/vncserver@:${_displaynumber}.service":
-                  ensure  => $_ensure,
-                  content =>  epp('tigervnc/systemd_service.epp', { 'username' =>  $username }),
-                } ~> Class['systemd::systemctl::daemon_reload']
-              }
+          $_vncservers.each |String $username, Hash $useropts| {
+            if 'ensure' in $useropts {
+              $_ensure = $useropts[ensure]
+            } else {
+              $_ensure = 'present'
+            }
+            $_displaynumber = $useropts[displaynumber]
+            if 'args' in $useropts {
+              $_args = $useropts[args]
+              file { "/etc/systemd/system/vncserver@:${_displaynumber}.service":
+                ensure  => $_ensure,
+                content =>  epp('tigervnc/systemd_service_with_args.epp', { 'username' =>  $username, 'args' =>  $_args }),
+              } ~> Class['systemd::systemctl::daemon_reload']
+            } else {
+              file { "/etc/systemd/system/vncserver@:${_displaynumber}.service":
+                ensure  => $_ensure,
+                content =>  epp('tigervnc/systemd_service.epp', { 'username' =>  $username }),
+              } ~> Class['systemd::systemctl::daemon_reload']
             }
           }
         }

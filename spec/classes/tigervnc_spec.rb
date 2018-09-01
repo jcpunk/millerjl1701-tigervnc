@@ -195,6 +195,16 @@ describe 'tigervnc' do
             end
           end
         end
+
+        context "tigervnc class with empty hash for vncservers" do
+          let(:params){
+            {
+              :vncservers => {}
+            }
+          }
+
+          it { expect { is_expected.to contain_exec('create_vncuser_passwd_testuser') }.to raise_error(Puppet::PreformattedError, /no vncservers were defined for use with tigervnc::config class/) }
+        end
       end
     end
   end
