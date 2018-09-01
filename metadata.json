@@ -1,6 +1,6 @@
 {
   "name": "millerjl1701-tigervnc",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "millerjl1701",
   "summary": "Puppet module for managing the installation and configuration of the tigervnc server.",
   "license": "Apache-2.0",
