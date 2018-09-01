@@ -23,7 +23,7 @@ class tigervnc (
   Enum['running', 'stopped'] $service_ensure           = 'running',
   String                     $service_name             = 'vncserver',
   String                     $sysconfig_template       = 'tigervnc/sysconfig_vncservers.erb',
-  Stdlib::Unixpath           $user_homedir_path        = '/home', 
+  Stdlib::Unixpath           $user_homedir_path        = '/home',
   String                     $vncuser_default_passwd   = 'ChangeMe',
   ) {
   case $::operatingsystem {

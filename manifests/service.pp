@@ -20,7 +20,7 @@ class tigervnc::service {
           $_vncservers = $tigervnc::vncservers
           $_vncservers_length = length($_vncservers)
           if $_vncservers_length == 0 {
-            fail("no vncservers were defined for use with tigervnc::service class on the CentOS 7 OS")
+            fail('no vncservers were defined for use with tigervnc::service class on the CentOS 7 OS')
           } else {
             $_vncservers.each |String $username, Hash $useropts| {
               if 'ensure' in $useropts {

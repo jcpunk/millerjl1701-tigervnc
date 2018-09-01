@@ -5,11 +5,11 @@
 class tigervnc::config {
   assert_private('tigervnc::config is a private class')
 
- $_vncservers = $tigervnc::vncservers
- $_vncservers_length = length($_vncservers)
- if $_vncservers_length == 0 {
-   fail("no vncservers were defined for use with tigervnc::config class")
- }
+  $_vncservers = $tigervnc::vncservers
+  $_vncservers_length = length($_vncservers)
+  if $_vncservers_length == 0 {
+    fail('no vncservers were defined for use with tigervnc::config class')
+  }
 
   case $::operatingsystem {
     'RedHat', 'CentOS': {
