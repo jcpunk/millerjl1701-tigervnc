@@ -1,6 +1,6 @@
 # @api private
 #
-# This class is meant to be called from tigervnc to manage the tigervnc service.
+# This class is meant to be called from tigervnc to manage the vncserver service.
 #
 class tigervnc::service {
   assert_private('tigervnc::service is a private class')

@@ -3,7 +3,6 @@ bin/
 coverage/
 .dependencies/
 doc/
-docs/
 .DS_Store
 Gemfile.lock
 Gemfile.local

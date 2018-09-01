@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.9.16
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="file_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="puppet_class_list_link"
+        href="puppet_class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><div id='filecontents'><h1>tigervnc</h1>
+
+<p>master branch: <a href="http://travis-ci.org/millerjl1701/millerjl1701-tigervnc"><img src="https://secure.travis-ci.org/millerjl1701/millerjl1701-tigervnc.png?branch=master" alt="Build Status"></a></p>
+
+<h4>Table of Contents</h4>
+
+<ol>
+<li><a href="#module-description">Module Description - What the module does and why it is useful</a></li>
+<li><a href="#setup">Setup - The basics of getting started with tigervnc</a>
+
+<ul>
+<li><a href="#what-tigervnc-affects">What tigervnc affects</a></li>
+<li><a href="#setup-requirements">Setup requirements</a></li>
+<li><a href="#beginning-with-tigervnc">Beginning with tigervnc</a></li>
+</ul></li>
+<li><a href="#usage">Usage - Configuration options and additional functionality</a></li>
+<li><a href="#reference">Reference - An under-the-hood peek at what the module is doing and how</a></li>
+<li><a href="#limitations">Limitations - OS compatibility, etc.</a></li>
+<li><a href="#development">Development - Guide for contributing to the module</a></li>
+</ol>
+
+<h2>Module Description</h2>
+
+<p>This module installs, configures, and manages the tigervnc-server vncserver service.</p>
+
+<p>By default, it will set the vnc session password for each user to the same password but allows for the user to change their own password as they choose. Alternatively, one can set different vnc session passwords per user. Either allows for the vncserver service(s) to startup correctly on the very first application of the module. </p>
+
+<p>This module makes no assumptions for user authentication via XDMCP at this time. </p>
+
+<p>This module assumes that you are not going to use xinetd for management of the service at this time. </p>
+
+<p>If you prefer to use the xinetd/XDMCP method referenced in the documentation, please consider using the <a href="https://forge.puppet.com/simp/vnc">simp/vnc</a> module.</p>
+
+<p>For more details on the TigerVNC project, please see <a href="http://tigervnc.org/">http://tigervnc.org/</a>.</p>
+
+<p>For reference, the tigervnc-server installation and configuration documentation for RedHat is located at:</p>
+
+<ul>
+<li><a href="https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/deployment_guide/chap-tigervnc">https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/deployment_guide/chap-tigervnc</a></li>
+<li><a href="https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/system_administrators_guide/ch-tigervnc">https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/system_administrators_guide/ch-tigervnc</a></li>
+</ul>
+
+<p>This module is currently written to support CentOS/RedHat 6/7 operating systems. Other operating systems could be added if time permits (Pull requests are welcome. :)</p>
+
+<h2>Setup</h2>
+
+<h3>What tigervnc affects</h3>
+
+<ul>
+<li>Package: tigervnc-server</li>
+<li>File: /etc/sysconfig/vncservers (CentOS/RedHat 6)</li>
+<li>File: /etc/systemd/system/vncserver@:<em>displaynumber</em>.service (CentOS/RedHat 7)</li>
+<li>File: /home/<em>username</em>/.vnc (Managed by default. This can be disabled)</li>
+<li>File: /home/<em>username</em>/.vnc/passwd (Managed by default. This can be disabled)</li>
+<li>Service: vncserver (CentOS/RedHat 6)</li>
+<li>Service: vncserver@:<em>displaynumber</em>.service (CentOS/RedHat 7)</li>
+</ul>
+
+<h3>Setup Requirements</h3>
+
+<p>The user(s) that the vncserver will be run as must exist on the system prior to the tigervnc class being called. However, no assumption is made on how that user is created on the system- just that it exists. For a puppet way of managing users, one could use the <a href="https://forge.puppet.com/rberwald/accounts">rberwald/accounts</a>, and then you would likely want to setup in puppet code (site.pp or elsewhere) something similar to:</p>
+
+<pre class="code puppet"><code class="puppet">    Class[&#39;accounts&#39;] -&gt; Class[&#39;tigervnc&#39;]
+</code></pre>
+
+<p>to ensure proper resource ordering.</p>
+
+<p>For CentOS/RedHat 7, this module depends on the <a href="http://forge.puppet.com/camptocamp/systemd">camptocamp/systemd</a> module for management of the systemd unit file and systemd daemon-reload process.</p>
+
+<p>This module configures tigervnc-server using system service resources. If you prefer using xinetd for management of the vncserver processes, please consider using the <a href="https://forge.puppet.com/simp/vnc">simp/vnc</a> module instead.</p>
+
+<h3>Beginning with tigervnc</h3>
+
+<p>To install, configure and manage the tigervnc-server vncserver service for a single user with the basic defaults, one would use the following puppet code:</p>
+
+<pre class="code puppet"><code class="puppet">  class { &#39;tigervnc&#39;:
+    vncservers =&gt; {
+      &#39;user1&#39; =&gt; {
+        displaynumber =&gt; &#39;1&#39;,
+      },
+    },
+  }
+</code></pre>
+
+<p>which will launch a vncserver service process for the user &quot;user1&quot; listening at <strong>0.0.0.0:5901</strong>. </p>
+
+<h2>Usage</h2>
+
+<p>All parameters to the main class may be passed via puppet code or hiera.</p>
+
+<p>Note: the Puppet lookup function will by default create a merged hash from hiera data for the tigervnc::sysconfig_vncservers parameter. It is possible to override the merge behavior in your own hiera data; however, this has not been tested and could create unanticipated results.</p>
+
+<p>Some futher examples that one could do with the class.</p>
+
+<h3>Disable the management of vncpasswd files per user</h3>
+
+<pre class="code puppet"><code class="puppet">  class { &#39;tigervnc&#39;:
+    manage_vncuser_passwords =&gt; false,
+    vncservers               =&gt; {
+      &#39;user1&#39; =&gt; {
+        displaynumber =&gt; &#39;1&#39;,
+      },
+    },
+  }
+</code></pre>
+
+<p>Note: If one disables the class from managing the vncpasswd files, the vncserver service(s) will not start until the password file is created via other means.</p>
+
+<h3>Specify a default vncpasswd for all users</h3>
+
+<pre class="code puppet"><code class="puppet">  class { &#39;tigervnc&#39;:
+    vncuser_default_passwd =&gt; &#39;SuperDuperPassword&#39;,
+    vncservers             =&gt; {
+      &#39;user1&#39; =&gt; {
+        displaynumber =&gt; &#39;1&#39;,
+      },
+    },
+  }
+</code></pre>
+
+<p>Note: While a default password will be created for a user, this module does not manage the vncpasswd file once created. This allows for the user to change their vncpasswd as they desire. If the vnc passwd file is removed at somepoint, the class will recreate a passwd fie with either the default or specified user password.</p>
+
+<h3>Specify multiple vnc users</h3>
+
+<pre class="code puppet"><code class="puppet">  class { &#39;tigervnc&#39;:
+    vncservers             =&gt; {
+      &#39;user1&#39; =&gt; {
+        displaynumber =&gt; &#39;1&#39;,
+      },
+      &#39;user2&#39; =&gt; {
+        displaynumber =&gt; &#39;2&#39;,
+      }
+    },
+  }
+</code></pre>
+
+<p>and what this looks like in hiera:</p>
+
+<pre class="code yaml"><code class="yaml">---
+
+tigervnc::vncservers:
+  user1:
+    displaynumber: &#39;1&#39;
+  user2:
+    displaynumber: &#39;2&#39;
+</code></pre>
+
+<h3>Specify vncserver arguments for a different resolution and to listen on localhost only</h3>
+
+<pre class="code puppet"><code class="puppet">  class { &#39;tigervnc&#39;:
+    vncservers             =&gt; {
+      &#39;user1&#39; =&gt; {
+        displaynumber =&gt; &#39;1&#39;,
+      },
+      &#39;user2&#39; =&gt; {
+        displaynumber =&gt; &#39;2&#39;,
+        &#39;args&#39;        =&gt; [
+            &#39;geometry 1280x1024&#39;,
+            &#39;localhost&#39;,
+        ],
+      },
+    },
+  }
+</code></pre>
+
+<p>and what this looks like in hiera:</p>
+
+<pre class="code yaml"><code class="yaml">---
+
+tigervnc::vncservers:
+  user1:
+    displaynumber: &#39;1&#39;
+  user2:
+    displaynumber: &#39;2&#39;
+    args:
+      - &#39;geometry 1280x1024&#39;
+      - &#39;localhost&#39;
+</code></pre>
+
+<h3>Removing a systemd unit file and service (in this example for user2) on CentOS/RedHat 7</h3>
+
+<pre class="code puppet"><code class="puppet">  class { &#39;tigervnc&#39;:
+    vncservers             =&gt; {
+      &#39;user1&#39; =&gt; {
+        displaynumber =&gt; &#39;1&#39;,
+      },
+      &#39;user2&#39; =&gt; {
+        ensure        =&gt; &#39;absent&#39;,
+        displaynumber =&gt; &#39;2&#39;,
+      }
+    },
+  }
+</code></pre>
+
+<h2>Reference</h2>
+
+<p>Generated puppet strings documentation with examples is available from <a href="https://millerjl1701.github.io/millerjl1701-tigervnc">https://millerjl1701.github.io/millerjl1701-tigervnc</a>.</p>
+
+<p>The puppet strings documentation is also included in the /docs folder.</p>
+
+<h3>Public Class</h3>
+
+<ul>
+<li>tigervnc: Main class which installs, configures, and manages the vncserver service(s)</li>
+</ul>
+
+<h3>Private Classes</h3>
+
+<ul>
+<li>tigervnc::install: Class for installation of the tigervnc-server.</li>
+<li>tigervnc::config: Class for setting configuration files for the vncserver process(es)</li>
+<li>tigervnc::service: Class for managing the state of the vncserver process(es)</li>
+</ul>
+
+<h2>Limitations</h2>
+
+<p>This module currently supports CentOS/RedHat 6/7. In time, other operating systems may be added. Pull requests with tests are welcome!</p>
+
+<h2>Development</h2>
+
+<p>Please see the <a href="CONTRIBUTING.md">CONTRIBUTING document</a> for information on how to get started developing code and submit a pull request for this module. While written in an opinionated fashion at the start, over time this can become less and less the case.</p>
+
+<h3>Contributors</h3>
+
+<p>To see who is involved with this module, see the <a href="https://github.com/millerjl1701/millerjl1701-tigervnc/graphs/contributors">GitHub list of contributors</a> or the <a href="CONTRIBUTORS">CONTRIBUTORS document</a>.</p>
+</div></div>
+
+      <div id="footer">
+     Generated by <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>.
+</div>
+
+    </div>
+  </body>
+</html>
