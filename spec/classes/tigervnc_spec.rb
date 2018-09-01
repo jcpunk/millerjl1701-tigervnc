@@ -60,6 +60,19 @@ describe 'tigervnc' do
                 'hasrestart' => 'true',
               ) }
             end
+            if facts[:os]['release']['major'] == '7'
+              it { is_expected.to contain_class('systemd::systemctl::daemon_reload') }
+              it { is_expected.to contain_file('/etc/systemd/system/vncserver@:1.service').with_ensure('present') }
+              it { is_expected.to contain_file('/etc/systemd/system/vncserver@:1.service').that_notifies('Class[systemd::systemctl::daemon_reload]') }
+              it { is_expected.to contain_file('/etc/systemd/system/vncserver@:1.service').with_content(/ExecStart=\/usr\/sbin\/runuser -l testuser/) }
+              it { is_expected.to contain_file('/etc/systemd/system/vncserver@:1.service').with_content(/PIDFile=\/home\/testuser\/.vnc\/%H%i.pid/) }
+
+              it { is_expected.to contain_service('vncserver@:1.service').with(
+                'ensure' => 'running',
+                'enable' => 'true',
+              ) }
+              it { is_expected.to contain_service('vncserver@:1.service').that_subscribes_to('File[/etc/systemd/system/vncserver@:1.service]') }
+            end
           end
         end
 
@@ -96,6 +109,59 @@ describe 'tigervnc' do
             if facts[:os]['release']['major'] == '6'
               it { is_expected.to contain_file('/etc/sysconfig/vncservers').with_content(/VNCSERVERS="1:testuser 2:otheruser"/) }
             end
+            if facts[:os]['release']['major'] == '7'
+              it { is_expected.to contain_file('/etc/systemd/system/vncserver@:1.service').with_ensure('present') }
+              it { is_expected.to contain_file('/etc/systemd/system/vncserver@:1.service').that_notifies('Class[systemd::systemctl::daemon_reload]') }
+              it { is_expected.to contain_file('/etc/systemd/system/vncserver@:1.service').with_content(/ExecStart=\/usr\/sbin\/runuser -l testuser/) }
+              it { is_expected.to contain_file('/etc/systemd/system/vncserver@:1.service').with_content(/PIDFile=\/home\/testuser\/.vnc\/%H%i.pid/) }
+              it { is_expected.to contain_file('/etc/systemd/system/vncserver@:2.service').with_ensure('present') }
+              it { is_expected.to contain_file('/etc/systemd/system/vncserver@:2.service').that_notifies('Class[systemd::systemctl::daemon_reload]') }
+              it { is_expected.to contain_file('/etc/systemd/system/vncserver@:2.service').with_content(/ExecStart=\/usr\/sbin\/runuser -l otheruser/) }
+              it { is_expected.to contain_file('/etc/systemd/system/vncserver@:2.service').with_content(/PIDFile=\/home\/otheruser\/.vnc\/%H%i.pid/) }
+
+              it { is_expected.to contain_service('vncserver@:1.service').with(
+                'ensure' => 'running',
+                'enable' => 'true',
+              ) }
+              it { is_expected.to contain_service('vncserver@:1.service').that_subscribes_to('File[/etc/systemd/system/vncserver@:1.service]') }
+              it { is_expected.to contain_service('vncserver@:2.service').with(
+                'ensure' => 'running',
+                'enable' => 'true',
+              ) }
+              it { is_expected.to contain_service('vncserver@:2.service').that_subscribes_to('File[/etc/systemd/system/vncserver@:1.service]') }
+            end
+          end
+        end
+
+        context "tigervnc class with two vncservers specified with one set to ensure absent" do
+          let(:params){
+            {
+              :vncservers => {
+                'testuser' => {
+                  'displaynumber' => '1',
+                  'ensure'        => 'absent',
+                },
+                'otheruser' => {
+                  'displaynumber' => '2',
+                },
+              }
+            }
+          }
+
+          if facts[:os]['release']['major'] == '7'
+            it { is_expected.to contain_file('/etc/systemd/system/vncserver@:1.service').with_ensure('absent') }
+            it { is_expected.to contain_file('/etc/systemd/system/vncserver@:1.service').that_notifies('Class[systemd::systemctl::daemon_reload]') }
+            it { is_expected.to contain_file('/etc/systemd/system/vncserver@:2.service').with_ensure('present') }
+            it { is_expected.to contain_file('/etc/systemd/system/vncserver@:2.service').that_notifies('Class[systemd::systemctl::daemon_reload]') }
+              it { is_expected.to contain_file('/etc/systemd/system/vncserver@:2.service').with_content(/ExecStart=\/usr\/sbin\/runuser -l otheruser/) }
+              it { is_expected.to contain_file('/etc/systemd/system/vncserver@:2.service').with_content(/PIDFile=\/home\/otheruser\/.vnc\/%H%i.pid/) }
+
+            it { is_expected.to_not contain_service('vncserver@:1.service') }
+            it { is_expected.to contain_service('vncserver@:2.service').with(
+              'ensure' => 'running',
+              'enable' => 'true',
+            ) }
+            it { is_expected.to contain_service('vncserver@:2.service').that_subscribes_to('File[/etc/systemd/system/vncserver@:1.service]') }
           end
         end
 
@@ -120,6 +186,12 @@ describe 'tigervnc' do
             if facts[:os]['release']['major'] == '6'
               it { is_expected.to contain_file('/etc/sysconfig/vncservers').with_content(/VNCSERVERARGS\[1\]/) }
               it { is_expected.to contain_file('/etc/sysconfig/vncservers').with_content(/-geometry 1280x1024 -localhost/) }
+            end
+
+            if facts[:os]['release']['major'] == '7'
+              it { is_expected.to contain_file('/etc/systemd/system/vncserver@:1.service').with_content(/ExecStart=\/usr\/sbin\/runuser -l testuser/) }
+              it { is_expected.to contain_file('/etc/systemd/system/vncserver@:1.service').with_content(/PIDFile=\/home\/testuser\/.vnc\/%H%i.pid/) }
+              it { is_expected.to contain_file('/etc/systemd/system/vncserver@:1.service').with_content(/-geometry 1280x1024 -localhost/) }
             end
           end
         end
